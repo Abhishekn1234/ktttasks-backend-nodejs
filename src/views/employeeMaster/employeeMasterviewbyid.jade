@@ -1,0 +1,80 @@
+extends ../layout/layout
+
+block content
+  .container
+    .page-banner
+      .row.align-items-center
+        .col-md-8
+          h1 Employee Details
+          p.lead Review the core employee profile data.
+        .col-md-4.text-md-end.mt-4.mt-md-0
+          a.btn.btn-light.btn-lg(href="/employeeMaster") Back to List
+
+    .card
+      .card-body
+        dl.row.mb-0
+          dt.col-sm-3 ID
+          dd.col-sm-9#fieldId Loading...
+          dt.col-sm-3 Name
+          dd.col-sm-9#fieldName Loading...
+          dt.col-sm-3 Email
+          dd.col-sm-9#fieldEmail Loading...
+          dt.col-sm-3 Phone
+          dd.col-sm-9#fieldPhone Loading...
+          dt.col-sm-3 Department
+          dd.col-sm-9#fieldDepartment Loading...
+          dt.col-sm-3 Designation
+          dd.col-sm-9#fieldDesignation Loading...
+          dt.col-sm-3 Salary
+          dd.col-sm-9#fieldSalary Loading...
+          dt.col-sm-3 Joining Date
+          dd.col-sm-9#fieldJoiningDate Loading...
+          dt.col-sm-3 Status
+          dd.col-sm-9#fieldStatus Loading...
+          dt.col-sm-3 Address
+          dd.col-sm-9#fieldAddress Loading...
+
+    script.
+        const employeeId = !{JSON.stringify(employeeId)};
+
+        function formatDate(dateString) {
+        if (!dateString) return "-";
+
+        const date = new Date(dateString);
+
+        return date.toLocaleDateString("en-IN", {
+            year: "numeric",
+            month: "long",
+            day: "numeric"
+        });
+        }
+
+        async function loadEmployeeDetails() {
+        try {
+            const response = await fetch(`/api/employeemaster/employees/${employeeId}`);
+
+            if (!response.ok) {
+            throw new Error("Failed to fetch employee details");
+            }
+
+            const employee = await response.json();
+
+            document.getElementById("fieldId").textContent = employee.employeeId || "-";
+            document.getElementById("fieldName").textContent = employee.employeeName || "-";
+            document.getElementById("fieldEmail").textContent = employee.employeeEmail || "-";
+            document.getElementById("fieldPhone").textContent = employee.employeePhone || "-";
+            document.getElementById("fieldDepartment").textContent = employee.employeeDepartment || "-";
+            document.getElementById("fieldDesignation").textContent = employee.employeeDesignation || "-";
+            document.getElementById("fieldSalary").textContent =
+            employee.employeeSalary != null ? `₹${employee.employeeSalary}` : "-";
+            document.getElementById("fieldJoiningDate").textContent =
+            formatDate(employee.employeeJoiningDate);
+            document.getElementById("fieldStatus").textContent = employee.employeeStatus || "-";
+            document.getElementById("fieldAddress").textContent = employee.employeeAddress || "-";
+        } catch (err) {
+            console.error(err);
+            alert("Unable to load employee details.");
+        }
+        }
+
+        loadEmployeeDetails();

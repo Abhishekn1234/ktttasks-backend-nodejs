@@ -1,0 +1,50 @@
+extends ../layout/layout
+
+block content
+  .container
+    .page-banner
+      .row.align-items-center
+        .col-md-8
+          h1 Asset History
+          p.lead Track the full lifecycle of this asset - from purchase to scrap.
+        .col-md-4.text-md-end.mt-3.mt-md-0
+          a.btn.btn-light.btn-lg(href="/assetsMaster") Back to Assets
+    .card.mb-4
+      .card-body
+        dl.row.mb-0
+          dt.col-sm-3 Asset Code
+          dd.col-sm-9= asset.assetCode || '-'
+          dt.col-sm-3 Asset Name
+          dd.col-sm-9= asset.assetName || '-'
+          dt.col-sm-3 Serial Number
+          dd.col-sm-9= asset.serialNumber || '-'
+          dt.col-sm-3 Purchase Cost
+          dd.col-sm-9= asset.purchaseCost || '-'
+          dt.col-sm-3 Current Status
+          dd.col-sm-9
+            span.badge(class=asset.status === 'Available' ? 'bg-success' : asset.status === 'Assigned' ? 'bg-info' : asset.status === 'Maintenance' ? 'bg-warning text-dark' : asset.status === 'Scrapped' ? 'bg-danger' : 'bg-secondary')= asset.status || '-'
+    .card
+      .card-body
+        h2.h5.mb-4 Lifecycle Timeline
+        if history && history.length
+          ul.timeline.list-unstyled.mb-0
+            each event in history
+              li.timeline-item.d-flex.mb-4
+                .timeline-marker.me-3
+                  .rounded-circle.d-flex.align-items-center.justify-content-center(
+                    style="width: 44px; height: 44px;"
+                    class=event.eventType === 'Created' ? 'bg-success-subtle' : event.eventType === 'Issued' ? 'bg-primary-subtle' : event.eventType === 'Returned' ? 'bg-info-subtle' : event.eventType === 'Scrapped' ? 'bg-danger-subtle' : 'bg-secondary-subtle'
+                  )
+                    strong.text-dark= event.eventType === 'Created' ? 'P' : event.eventType === 'Issued' ? 'I' : event.eventType === 'Returned' ? 'R' : event.eventType === 'Scrapped' ? 'S' : 'U'
+                .flex-grow-1
+                  .d-flex.justify-content-between.align-items-center
+                    h6.mb-1
+                      span.badge(
+                        class=event.eventType === 'Created' ? 'bg-success' : event.eventType === 'Issued' ? 'bg-primary' : event.eventType === 'Returned' ? 'bg-info' : event.eventType === 'Scrapped' ? 'bg-danger' : 'bg-secondary'
+                      )= event.eventType
+                    small.text-muted= new Date(event.eventDate).toLocaleString()
+                  p.mb-0= event.eventDescription || ''
+        else
+          .alert.alert-info.mb-0
+            | No history recorded for this asset yet.
+

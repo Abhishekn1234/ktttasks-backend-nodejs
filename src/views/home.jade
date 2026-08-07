@@ -1,0 +1,37 @@
+extends layout/layout
+
+block content
+  .container
+    .page-banner
+      .row.align-items-center
+        .col-lg-7
+          h1 Welcome to KTT Admin
+          p.lead Manage employees, assets, and categories from one polished admin portal.
+        .col-lg-5.text-lg-end.mt-4.mt-lg-0
+          a.btn.btn-light.btn-lg.me-2(href="/employeeMaster") Employee Directory
+          a.btn.btn-outline-light.btn-lg(href="/assetsMaster") Assets
+    .row.g-4.mt-4
+      .col-md-3
+        .card.h-100
+          .card-body
+            h5.card-title Employee Master
+            p.card-text Review, search, and manage employee records.
+            a.btn.btn-primary(href="/employeeMaster") Open
+      .col-md-3
+        .card.h-100
+          .card-body
+            h5.card-title Asset Master
+            p.card-text Plan asset tracking and inventory workflows.
+            a.btn.btn-primary(href="/assetsMaster") Open
+      .col-md-3
+        .card.h-100
+          .card-body
+            h5.card-title Asset Categories
+            p.card-text Define categories and organize assets cleanly.
+            a.btn.btn-primary(href="/assetsCategory") Open
+      .col-md-3
+        .card.h-100
+          .card-body
+            h5.card-title Stock Overview
+            p.card-text Monitor stock status and quickly filter assets by availability.
+            a.btn.btn-primary(href="/stock/view") Open

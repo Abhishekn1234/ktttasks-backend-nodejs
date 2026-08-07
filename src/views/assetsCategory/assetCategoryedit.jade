@@ -1,0 +1,61 @@
+extends ../layout/layout
+
+block content
+  .container
+    .page-banner
+      .row.align-items-center
+        .col-lg-8
+          h1 Edit Category
+          p.lead Update category details.
+        .col-lg-4.text-lg-end.mt-4.mt-lg-0
+          a.btn.btn-light.btn-lg(href="/assetsCategory") Back to Categories
+    .card
+      .card-body
+        form#categoryForm
+          .row.g-3
+            .col-md-6
+              label.form-label(for="categoryName") Category Name
+              input.form-control(type="text" id="categoryName" name="categoryName" required)
+            .col-md-6
+              label.form-label(for="isActive") Active
+              select.form-select(id="isActive" name="isActive")
+                option(value="true") Yes
+                option(value="false") No
+            .col-12
+              label.form-label(for="categoryDescription") Description
+              textarea.form-control(id="categoryDescription" name="categoryDescription" rows="3")
+          .mt-4.d-flex.justify-content-end.gap-3
+            a.btn.btn-outline-secondary(href="/assetsCategory") Cancel
+            button.btn.btn-primary(type="submit") Update Category
+    script.
+      const categoryId = !{JSON.stringify(categoryId)};
+      async function loadCategory() {
+        const response = await fetch(`/api/assetsCategory/categories/${categoryId}`);
+        if (!response.ok) {
+          alert('Unable to load category');
+          return;
+        }
+        const category = await response.json();
+        document.getElementById('categoryName').value = category.categoryName || '';
+        document.getElementById('categoryDescription').value = category.categoryDescription || '';
+        document.getElementById('isActive').value = category.isActive ? 'true' : 'false';
+      }
+      document.getElementById('categoryForm').addEventListener('submit', async function(event) {
+        event.preventDefault();
+        const form = event.target;
+        const response = await fetch(`/api/assetsCategory/categories/${categoryId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            categoryName: form.categoryName.value,
+            categoryDescription: form.categoryDescription.value,
+            isActive: form.isActive.value === 'true'
+          })
+        });
+        if (response.ok) {
+          window.location.href = '/assetsCategory';
+        } else {
+          alert('Unable to update category');
+        }
+      });
+      loadCategory();

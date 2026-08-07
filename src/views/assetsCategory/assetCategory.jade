@@ -1,0 +1,60 @@
+extends ../layout/layout
+
+block content
+  .container
+    .page-banner
+      .row.align-items-center
+        .col-md-8
+          h1 Asset Categories
+          p.lead Organize your assets by category and status.
+        .col-md-4.text-md-end.mt-3.mt-md-0
+          a.btn.btn-light.btn-lg(href="/assetsCategory/add") Add Category
+    .card
+      .card-body
+        .d-flex.justify-content-between.align-items-center.mb-4
+          h2.h5.mb-0 Category Directory 
+          if categories.length===0
+          
+          else
+          form.d-flex(role="search" action="/assetsCategory" method="get")
+            input.form-control.form-control-sm.me-2(type="search" name="search" placeholder="Search categories")
+            button.btn.btn-outline-primary.btn-sm(type="submit") Search
+        if categories && categories.length
+          .table-responsive
+            table.table.table-hover.mb-0
+              thead
+                tr
+                  th ID
+                  th Name
+                  th Description
+                  th Active
+                  th.text-center Actions
+              tbody
+                each category in categories
+                  tr
+                    td= category.categoryId
+                    td= category.categoryName
+                    td= category.categoryDescription || "-"
+                    td
+                      if category.isActive
+                        span.badge.text-bg-success Active
+                      else
+                        span.badge.text-bg-secondary Inactive
+                    td.text-center
+                      a.btn.btn-sm.btn-outline-primary.me-2(href=`/assetsCategory/view/${category.categoryId}`) View
+                      a.btn.btn-sm.btn-outline-secondary.me-2(href=`/assetsCategory/edit/${category.categoryId}`) Edit
+                      button.btn.btn-sm.btn-outline-danger(type="button" onclick=`deleteCategory(${category.categoryId})`) Delete
+        else
+          .alert.alert-info.mb-0
+            | No categories found yet. Add a new category to start organizing assets.
+    script.
+      async function deleteCategory(id) {
+        if (!confirm('Delete this category?')) return;
+        try {
+          const response = await fetch(`/api/assetsCategory/categories/${id}`, { method: 'DELETE' });
+          if (response.ok) window.location.reload();
+          else alert('Unable to delete category.');
+        } catch (err) {
+          alert('Delete request failed.');
+        }
+      }

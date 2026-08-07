@@ -1,0 +1,89 @@
+doctype html
+html(lang="en")
+  head
+    meta(charset="utf-8")
+    meta(name="viewport" content="width=device-width, initial-scale=1")
+    title KTT Asset & Employee Management
+    link(rel="preconnect" href="https://fonts.googleapis.com")
+    link(rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous")
+    link(href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet")
+    link(rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous")
+    style.
+      :root {
+        --brand: #0d6efd;
+        --brand-soft: rgba(13, 110, 253, 0.14);
+        --page-bg: #f4f7fb;
+        --surface: #ffffff;
+        --text-strong: #111827;
+        --text-muted: #6c757d;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        background: var(--page-bg);
+        color: var(--text-strong);
+      }
+      .app-shell {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+      .main-content {
+        flex: 1 0 auto;
+        padding-top: 100px;
+        padding-bottom: 2rem;
+      }
+      .page-banner {
+        background: linear-gradient(135deg, #0d6efd 0%, #5e80ff 100%);
+        border-radius: 1rem;
+        color: white;
+        padding: 2rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 24px 80px rgba(13, 110, 253, 0.14);
+      }
+      .page-banner p {
+        color: rgba(255, 255, 255, 0.92);
+      }
+      .navbar-brand strong {
+        letter-spacing: 0.04em;
+      }
+      .site-footer {
+        background: #0b1726;
+        color: #d1d5db;
+        padding: 2.5rem 0;
+      }
+      .site-footer a {
+        color: #ffffff;
+        text-decoration: none;
+      }
+      .site-footer a:hover {
+        color: #8ab7ff;
+      }
+      .footer-links li {
+        margin-bottom: 0.6rem;
+      }
+      .card,
+      .table {
+        border-radius: 1rem;
+        box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06);
+      }
+      .table thead {
+        background: #f8f9ff;
+      }
+      .table td,
+      .table th {
+        vertical-align: middle;
+      }
+      .btn-outline-light {
+        border-color: rgba(255, 255, 255, 0.7);
+      }
+  body
+    .app-shell
+      include navbar
+      main.main-content
+        block content
+      include footer
+    script(src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous")

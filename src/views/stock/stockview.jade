@@ -1,0 +1,92 @@
+extends ../layout/layout
+
+block content
+  .container
+    .page-banner
+      .row.align-items-center
+        .col-lg-8
+          h1 Stock Overview
+          p.lead Monitor the current asset inventory and filter by availability status.
+        .col-lg-4.text-lg-end.mt-4.mt-lg-0
+          a.btn.btn-outline-light.btn-lg.me-2(href="/assetsMaster") Manage Assets
+          a.btn.btn-light.btn-lg(href="/") Back Home
+
+    .row.g-4.mb-4
+      .col-lg-4
+        .card.h-100
+          .card-body
+            h5.card-title Filter stock
+            form(method="get" action="/stock/view")
+              .mb-3
+                label.form-label(for="status") Status
+                select.form-select(id="status" name="status")
+                  option(value="" selected=!selectedStatus) All Statuses
+                  option(value="Available" selected=selectedStatus === 'Available') Available
+                  option(value="Assigned" selected=selectedStatus === 'Assigned') Assigned
+                  option(value="Maintenance" selected=selectedStatus === 'Maintenance') Maintenance
+                  option(value="Retired" selected=selectedStatus === 'Retired') Retired
+                div.small.text-muted.mt-2 Scrapped assets only appear in the Reports page.
+              button.btn.btn-primary(type="submit") Apply
+      .col-lg-8
+        .card.h-100
+          .card-body
+            h5.card-title Inventory summary
+            .row.g-3
+              .col-md-4
+                .border.rounded.p-3.text-center
+                  h3.mb-1= assets ? assets.length : 0
+                  p.text-muted.mb-0 Assets listed
+              .col-md-4
+                .border.rounded.p-3.text-center
+                  h3.mb-1= assets ? assets.filter(function(item) { return item.status === 'Available'; }).length : 0
+                  p.text-muted.mb-0 Available
+              .col-md-4
+                .border.rounded.p-3.text-center
+                  h3.mb-1= assets ? assets.filter(function(item) { return item.status === 'Assigned'; }).length : 0
+                  p.text-muted.mb-0 Assigned
+            if branchTotals && branchTotals.length
+              .mt-4
+                h6.mb-3 Branch totals by location
+                .row.g-2
+                  each branchInfo in branchTotals
+                    .col-sm-6
+                      .border.rounded.p-2.d-flex.justify-content-between.align-items-center
+                        span= branchInfo.branch
+                        span.badge.bg-secondary.text-white= branchInfo.count
+            else
+              .mt-4.text-muted No branch totals available.
+
+    .card
+      .card-body
+        .d-flex.justify-content-between.align-items-center.mb-3
+          h4.mb-0 Stock list
+          if selectedStatus
+            span.badge.bg-primary-subtle.text-primary Status: #{selectedStatus}
+        if assets && assets.length
+          .table-responsive
+            table.table.table-hover.align-middle
+              thead
+                tr
+                  th Asset Name
+                  th Code
+                  th Category
+                  th Status
+                  th Location
+                  th Vendor
+              tbody
+                each asset in assets
+                  tr
+                    td= asset.assetName
+                    td= asset.assetCode
+                    td= asset.assetCategory ? asset.assetCategory.categoryName : '—'
+                    td
+                      span.badge(class=asset.status === 'Available' ? 'bg-success' : asset.status === 'Assigned' ? 'bg-info' : asset.status === 'Maintenance' ? 'bg-warning text-dark' : 'bg-secondary')= asset.status
+                    td= asset.location || '—'
+                    td= asset.vendor || '—'
+          .mt-4.d-flex.justify-content-between.align-items-center.border-top.pt-3
+            strong Total value of listed stock:
+            span.fs-5.text-success= totalValueFormatted || '$0.00'
+        else
+          .text-center.py-5
+            h5 No stock records found
+            p.text-muted Try changing the status filter or add a new asset.

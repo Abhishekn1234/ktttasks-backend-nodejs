@@ -1,0 +1,63 @@
+extends ../layout/layout
+
+block content
+  .container
+    .page-banner
+      .row.align-items-center
+        .col-lg-8
+          h1 Issue Asset
+          p.lead Create a new asset issue record for an employee.
+        .col-lg-4.text-lg-end.mt-4.mt-lg-0
+          a.btn.btn-light.btn-lg(href="/assetIssues") Back to Issues
+    .card
+      .card-body
+        form#issueForm
+          .row.g-3
+            .col-md-6
+              label.form-label(for="employeeId") Employee
+              select.form-select(id="employeeId" name="employeeId" required)
+                option(value="" selected disabled) Select employee
+                if employees && employees.length
+                  each employee in employees
+                    option(value=employee.employeeId)= employee.employeeName
+                else
+                  option(value="" disabled) No active employees available
+            .col-md-6
+              label.form-label(for="assetId") Asset
+              select.form-select(id="assetId" name="assetId" required)
+                option(value="" selected disabled) Select asset
+                if assets && assets.length
+                  each asset in assets
+                    option(value=asset.assetId)= `${asset.assetName} (${asset.assetCode})`
+                else
+                  option(value="" disabled) No available assets available
+            .col-md-6
+              label.form-label(for="issueDate") Issue Date
+              input.form-control(type="date" id="issueDate" name="issueDate" required)
+            .col-md-6
+              label.form-label(for="remarks") Remarks
+              input.form-control(type="text" id="remarks" name="remarks")
+          .mt-4.d-flex.justify-content-end.gap-3
+            a.btn.btn-outline-secondary(href="/assetIssues") Cancel
+            button.btn.btn-primary(type="submit") Save Issue
+    script.
+      document.getElementById('issueForm').addEventListener('submit', async function(event) {
+        event.preventDefault();
+        const form = event.target;
+        const response = await fetch('/api/assetIssues/issues', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            employeeId: parseInt(form.employeeId.value, 10),
+            assetId: parseInt(form.assetId.value, 10),
+            issueDate: form.issueDate.value,
+            remarks: form.remarks.value
+          })
+        });
+        if (response.ok) {
+          window.location.href = '/assetIssues';
+        } else {
+          const err = await response.text();
+          alert(err || 'Unable to save issue');
+        }
+      });

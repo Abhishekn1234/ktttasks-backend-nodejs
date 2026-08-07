@@ -1,0 +1,54 @@
+extends ../layout/layout
+
+block content
+  .container
+    .page-banner
+      .row.align-items-center
+        .col-lg-8
+          h1 Return Asset
+          p.lead Record the return details for this issued asset.
+        .col-lg-4.text-lg-end.mt-4.mt-lg-0
+          a.btn.btn-light.btn-lg(href="/assetIssues") Back to Issues
+    .card
+      .card-body
+        form#returnForm
+          .row.g-3
+            .col-md-6
+              label.form-label(for="returnDate") Return Date
+              input.form-control(type="date" id="returnDate" name="returnDate" required)
+            .col-md-6
+              label.form-label(for="returnReason") Return Reason
+              select.form-select(id="returnReason" name="returnReason")
+                option(value="") Select reason
+                option(value="Upgrade") Upgrade
+                option(value="Repair") Repair
+                option(value="Resignation") Resignation
+                option(value="Replacement") Replacement
+                option(value="Other") Other
+            .col-12
+              label.form-label(for="remarks") Remarks
+              textarea.form-control(id="remarks" name="remarks" rows="3")
+          .mt-4.d-flex.justify-content-end.gap-3
+            a.btn.btn-outline-secondary(href="/assetIssues") Cancel
+            button.btn.btn-primary(type="submit") Save Return
+    script.
+      const issueId = !{JSON.stringify(issueId)};
+      document.getElementById('returnForm').addEventListener('submit', async function(event) {
+        event.preventDefault();
+        const form = event.target;
+        const response = await fetch(`/api/assetIssues/issues/${issueId}/return`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            returnDate: form.returnDate.value,
+            returnReason: form.returnReason.value || null,
+            remarks: form.remarks.value
+          })
+        });
+        if (response.ok) {
+          window.location.href = '/assetIssues';
+        } else {
+          const err = await response.text();
+          alert(err || 'Unable to save return');
+        }
+      });

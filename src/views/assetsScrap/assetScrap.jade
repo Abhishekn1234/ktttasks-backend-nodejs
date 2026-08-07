@@ -1,0 +1,83 @@
+extends ../layout/layout
+
+block content
+  - function formatDisplayDate(dateString) {
+  -   if (!dateString) return '-';
+  -   const parsedDate = new Date(dateString);
+  -   if (Number.isNaN(parsedDate.getTime())) return dateString;
+  -   const day = String(parsedDate.getDate()).padStart(2, '0');
+  -   const month = parsedDate.toLocaleDateString('en-US', { month: 'short' }).toLowerCase();
+  -   const year = parsedDate.getFullYear();
+  -   return `${day} ${month} ${year}`;
+  - }
+  .container
+    .page-banner
+      .row.align-items-center
+        .col-md-8
+          h1 Scrap Asset
+          p.lead Mark this asset as obsolete. Once scrapped, it will only be visible in reports.
+        .col-md-4.text-md-end.mt-3.mt-md-0
+          a.btn.btn-light.btn-lg(href="/assetsMaster") Back to Assets
+    .card
+      .card-body
+        
+        dl.row
+          dt.col-sm-3 Asset Code
+          dd.col-sm-9= asset.assetCode || '-'
+          dt.col-sm-3 Asset Name
+          dd.col-sm-9= asset.assetName || '-'
+          dt.col-sm-3 Make / Model
+          dd.col-sm-9= (asset.make || '-') + ' / ' + (asset.model || '-')
+          dt.col-sm-3 Serial Number
+          dd.col-sm-9= asset.serialNumber || '-'
+          dt.col-sm-3 Purchase Date
+          dd.col-sm-9= asset.purchaseDate ? formatDisplayDate(asset.purchaseDate) : '-'
+          dt.col-sm-3 Purchase Cost
+          dd.col-sm-9= asset.purchaseCost || '-'
+          dt.col-sm-3 Current Status
+          dd.col-sm-9
+            span.badge(class=asset.status === 'Available' ? 'bg-success' : asset.status === 'Assigned' ? 'bg-info' : asset.status === 'Maintenance' ? 'bg-warning text-dark' : 'bg-secondary')= asset.status || '-'
+        hr
+        form#scrapForm
+          .row.g-3
+            .col-md-6
+              label.form-label(for="scrapDate") Scrap Date
+              input.form-control(type="date" id="scrapDate" name="scrapDate" required)
+            .col-12
+              label.form-label(for="scrapReason") Reason for Scrapping
+              textarea.form-control(id="scrapReason" name="scrapReason" rows="3" placeholder="e.g. Obsolete, Damaged beyond repair, End of life, etc." required)
+          .mt-4.d-flex.justify-content-end.gap-3
+            a.btn.btn-outline-secondary(href="/assetsMaster") Cancel
+            button.btn.btn-danger(type="submit") Confirm Scrap
+    script.
+      const assetId = !{JSON.stringify(assetId)};
+      document.getElementById('scrapForm').addEventListener('submit', async function(event) {
+        event.preventDefault();
+        const form = event.target;
+        if (!form.scrapDate.value.trim()) {
+          alert('Scrap date is required.');
+          form.scrapDate.focus();
+          return;
+        }
+        if (!form.scrapReason.value.trim()) {
+          alert('Scrap reason is required.');
+          form.scrapReason.focus();
+          return;
+        }
+        if (!confirm('Are you sure you want to scrap this asset? This cannot be undone via the UI.')) return;
+        const response = await fetch(`/api/assetsMaster/assets/${assetId}/scrap`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            scrapDate: form.scrapDate.value || null,
+            scrapReason: form.scrapReason.value.trim()
+          })
+        });
+        if (response.ok) {
+          window.location.href = '/assetsMaster/reports';
+        } else {
+          const data = await response.json().catch(() => ({}));
+          alert(data.error || 'Unable to scrap asset');
+        }
+      });
+

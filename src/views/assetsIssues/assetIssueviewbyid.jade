@@ -1,0 +1,30 @@
+extends ../layout/layout
+
+block content
+  .container
+    .page-banner
+      .row.align-items-center
+        .col-md-8
+          h1 Issue Details
+          p.lead Review the selected asset issue record.
+        .col-md-4.text-md-end.mt-3.mt-md-0
+          a.btn.btn-light.btn-lg(href="/assetIssues") Back to Issues
+    .card
+      .card-body
+        dl.row.mb-0
+          dt.col-sm-3 Issue ID
+          dd.col-sm-9= issue.issueId
+          dt.col-sm-3 Employee
+          dd.col-sm-9= issue.employeeName || '-'
+          dt.col-sm-3 Asset
+          dd.col-sm-9= issue.assetName || '-'
+          dt.col-sm-3 Issue Date
+          dd.col-sm-9= issue.issueDate || '-'
+          dt.col-sm-3 Return Date
+          dd.col-sm-9= issue.returnDate || '-'
+          dt.col-sm-3 Return Reason
+          dd.col-sm-9= issue.returnReason || '-'
+          dt.col-sm-3 Status
+          dd.col-sm-9= issue.status || '-'
+          dt.col-sm-3 Remarks
+          dd.col-sm-9= issue.remarks || '-'

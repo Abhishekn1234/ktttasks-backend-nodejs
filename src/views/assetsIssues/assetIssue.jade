@@ -1,0 +1,65 @@
+extends ../layout/layout
+
+block content
+  .container
+    .page-banner
+      .row.align-items-center
+        .col-md-8
+          h1 Issue & Return
+          p.lead Track asset issuance and returns in one place.
+        .col-md-4.text-md-end.mt-3.mt-md-0
+          a.btn.btn-light.btn-lg(href="/assetIssues/add") Issue Asset
+    .card
+      .card-body
+        .d-flex.justify-content-between.align-items-center.mb-4
+          h2.h5.mb-0 Issue Records
+          if issues.length===0
+
+          else
+          form.d-flex(role="search" action="/assetIssues" method="get")
+            input.form-control.form-control-sm.me-2(type="search" name="search" placeholder="Search issues")
+            button.btn.btn-outline-primary.btn-sm(type="submit") Search
+        if issues && issues.length
+          .table-responsive
+            table.table.table-hover.mb-0
+              thead
+                tr
+                  th ID
+                  th Employee
+                  th Asset
+                  th Issue Date
+                  th Return Date
+                  th Status
+                  th Remarks
+                  th.text-center Actions
+              tbody
+                each issue in issues
+                  tr
+                    td= issue.issueId
+                    td= issue.employeeName || '-'
+                    td= issue.assetName || '-'
+                    td= issue.issueDate || '-'
+                    td= issue.returnDate || '-'
+                    td= issue.status || '-'
+                    td= issue.remarks || '-'
+                    td.text-center
+                      a.btn.btn-sm.btn-outline-primary.me-2(href='/assetIssues/view/' + issue.issueId) View
+                      if issue.status === 'Issued'
+                        a.btn.btn-sm.btn-outline-secondary.me-2(href='/assetIssues/return/' + issue.issueId)  Return
+                      else
+                        span.text-muted Returned
+                      button.btn.btn-sm.btn-outline-danger(type='button' data-id=issue.issueId onclick='deleteIssue(this.dataset.id)') Delete
+        else
+          .alert.alert-info.mb-0
+            | No issue records found yet.
+    script.
+      async function deleteIssue(id) {
+        if (!confirm('Delete this issue record?')) return;
+        try {
+          const response = await fetch(`/api/assetIssues/issues/${id}`, { method: 'DELETE' });
+          if (response.ok) window.location.reload();
+          else alert('Unable to delete issue record.');
+        } catch (err) {
+          alert('Delete request failed.');
+        }
+      }

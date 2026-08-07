@@ -1,0 +1,86 @@
+extends ../layout/layout
+
+block content
+  .container
+    .page-banner
+      .row.align-items-center
+        .col-md-8
+          h1 Asset Details
+          p.lead Review the selected asset.
+        .col-md-4.text-md-end.mt-3.mt-md-0
+          a.btn.btn-outline-light.btn-lg.me-2(href=`/assetsMaster/history/${assetId}`) History
+          a.btn.btn-danger.btn-lg.me-2(href=`/assetsMaster/scrap/${assetId}`) Scrap
+          a.btn.btn-light.btn-lg(href="/assetsMaster") Back to Assets
+    .card
+      .card-body
+        dl.row.mb-0
+          dt.col-sm-3 ID
+          dd.col-sm-9#assetId Loading...
+          dt.col-sm-3 Code
+          dd.col-sm-9#assetCode Loading...
+          dt.col-sm-3 Name
+          dd.col-sm-9#assetName Loading...
+          dt.col-sm-3 Category
+          dd.col-sm-9#categoryName Loading...
+          dt.col-sm-3 Make
+          dd.col-sm-9#make Loading...
+          dt.col-sm-3 Model
+          dd.col-sm-9#model Loading...
+          dt.col-sm-3 Serial Number
+          dd.col-sm-9#serialNumber Loading...
+          dt.col-sm-3 Purchase Date
+          dd.col-sm-9#purchaseDate Loading...
+          dt.col-sm-3 Purchase Cost
+          dd.col-sm-9#purchaseCost Loading...
+          dt.col-sm-3 Location
+          dd.col-sm-9#location Loading...
+          dt.col-sm-3 Vendor
+          dd.col-sm-9#vendor Loading...
+          dt.col-sm-3 Warranty Expiry
+          dd.col-sm-9#warrantyExpiry Loading...
+          dt.col-sm-3 Status
+          dd.col-sm-9#status Loading...
+          dt.col-sm-3 Scrap Date
+          dd.col-sm-9#scrapDate Loading...
+          dt.col-sm-3 Scrap Reason
+          dd.col-sm-9#scrapReason Loading...
+          dt.col-sm-3 Description
+          dd.col-sm-9#description Loading...
+    script.
+      const assetId = !{JSON.stringify(assetId)};
+
+      function formatDisplayDate(value) {
+        if (!value) return '-';
+        const parsedDate = new Date(value);
+        if (Number.isNaN(parsedDate.getTime())) return value;
+        const day = String(parsedDate.getDate()).padStart(2, '0');
+        const month = parsedDate.toLocaleDateString('en-US', { month: 'short' }).toLowerCase();
+        const year = parsedDate.getFullYear();
+        return `${day} ${month} ${year}`;
+      }
+
+      async function loadAssetDetails() {
+        const response = await fetch(`/api/assetsMaster/assets/${assetId}`);
+        if (!response.ok) {
+          alert('Unable to load asset details');
+          return;
+        }
+        const asset = await response.json();
+        document.getElementById('assetId').textContent = asset.assetId || '-';
+        document.getElementById('assetCode').textContent = asset.assetCode || '-';
+        document.getElementById('assetName').textContent = asset.assetName || '-';
+        document.getElementById('categoryName').textContent = asset.assetCategory?.categoryName || asset.categoryId || '-';
+        document.getElementById('make').textContent = asset.make || '-';
+        document.getElementById('model').textContent = asset.model || '-';
+        document.getElementById('serialNumber').textContent = asset.serialNumber || '-';
+        document.getElementById('purchaseDate').textContent = formatDisplayDate(asset.purchaseDate);
+        document.getElementById('purchaseCost').textContent = asset.purchaseCost || '-';
+        document.getElementById('location').textContent = asset.location || '-';
+        document.getElementById('vendor').textContent = asset.vendor || '-';
+        document.getElementById('warrantyExpiry').textContent = formatDisplayDate(asset.warrantyExpiry);
+        document.getElementById('status').textContent = asset.status || '-';
+        document.getElementById('scrapDate').textContent = formatDisplayDate(asset.scrapDate);
+        document.getElementById('scrapReason').textContent = asset.scrapReason || '-';
+        document.getElementById('description').textContent = asset.description || '-';
+      }
+      loadAssetDetails();

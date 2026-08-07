@@ -1,0 +1,74 @@
+extends ../layout/layout
+
+block content
+  .container
+    .page-banner
+      .row.align-items-center
+        .col-lg-8
+          h1 Add Employee
+          p.lead Create a new employee profile using the form below.
+        .col-lg-4.text-lg-end.mt-4.mt-lg-0
+          a.btn.btn-light.btn-lg(href="/employeeMaster") Back to List
+    .card
+      .card-body
+        form#employeeForm
+          .row.g-3
+            .col-md-6
+              label.form-label(for="employeeName") Full Name
+              input.form-control(type="text" id="employeeName" name="employeeName" required)
+            .col-md-6
+              label.form-label(for="employeeEmail") Email
+              input.form-control(type="email" id="employeeEmail" name="employeeEmail" required)
+            .col-md-6
+              label.form-label(for="employeePhone") Phone
+              input.form-control(type="text" id="employeePhone" name="employeePhone" required)
+            .col-md-6
+              label.form-label(for="employeeDepartment") Department
+              input.form-control(type="text" id="employeeDepartment" name="employeeDepartment" required)
+            .col-md-6
+              label.form-label(for="employeeDesignation") Designation
+              input.form-control(type="text" id="employeeDesignation" name="employeeDesignation" required)
+            .col-md-6
+              label.form-label(for="employeeSalary") Salary
+              input.form-control(type="number" step="0.01" id="employeeSalary" name="employeeSalary" required)
+            .col-md-6
+              label.form-label(for="employeeJoiningDate") Joining Date
+              input.form-control(type="date" id="employeeJoiningDate" name="employeeJoiningDate" required)
+            .col-md-6
+              label.form-label(for="employeeStatus") Status
+              select.form-select(id="employeeStatus" name="employeeStatus" required)
+                option(value="Active") Active
+                option(value="Inactive") Inactive
+            .col-12
+              label.form-label(for="employeeAddress") Address
+              textarea.form-control(id="employeeAddress" name="employeeAddress" rows="3")
+          .mt-4.d-flex.justify-content-end.gap-4
+             a.btn.btn-outline-secondary(href="/employeeMaster") Cancel
+             button.btn.btn-primary(type="submit") Save Employee
+    script.
+      document.getElementById('employeeForm').addEventListener('submit', async function(event) {
+        event.preventDefault();
+        const form = event.target;
+        const response = await fetch('/api/employeemaster/employees', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            employeeName: form.employeeName.value,
+            employeeEmail: form.employeeEmail.value,
+            employeePhone: form.employeePhone.value,
+            employeeAddress: form.employeeAddress.value,
+            employeeDepartment: form.employeeDepartment.value,
+            employeeDesignation: form.employeeDesignation.value,
+            employeeSalary: parseFloat(form.employeeSalary.value),
+            employeeJoiningDate: form.employeeJoiningDate.value,
+            employeeStatus: form.employeeStatus.value
+          })
+        });
+        if (response.ok) {
+          window.location.href = '/employeeMaster';
+        } else {
+          const error = await response.json();
+          alert(error.error || 'Unable to save employee');
+        }
+      });
+

@@ -1,0 +1,60 @@
+extends ../layout/layout
+
+block content
+  .container
+    .page-banner
+      .row.align-items-center
+        .col-lg-8
+          h1 Employee Master
+          p Manage your employee records in a clean, modern dashboard.
+        .col-lg-4.text-lg-end.mt-4.mt-lg-0
+          a.btn.btn-light.btn-lg(href="/employeeMaster/add") Add Employee
+    .card
+      .card-body
+        .d-flex.justify-content-between.align-items-center.mb-4
+          h2.h5.mb-0 Employee Directory
+          if employees.length===0
+          
+          else
+          form.d-flex(role="search" action="/employeeMaster" method="get")
+            input.form-control.form-control-sm.me-2(type="search" name="search" placeholder="Search employees")
+            button.btn.btn-outline-primary.btn-sm(type="submit") Search
+        if employees && employees.length
+          .table-responsive
+            table.table.table-hover.mb-0
+              thead
+                tr
+                  th ID
+                  th Name
+                  th Department
+                  th.text-center Actions
+              tbody
+                each employee in employees
+                  tr
+                    td= employee.employeeId
+                    td= employee.employeeName
+                    td= employee.employeeDepartment
+                    td.text-center
+                      a.btn.btn-sm.btn-outline-primary.me-2(href=`/employeeMaster/view/${employee.employeeId}`) View
+                      a.btn.btn-sm.btn-outline-secondary.me-2(href=`/employeeMaster/edit/${employee.employeeId}`) Edit
+                      button.btn.btn-sm.btn-outline-danger(type="button" onclick=`deleteEmployee(${employee.employeeId})`) Delete
+        else
+          .alert.alert-info.mb-0
+            | No employees found yet.
+    script.
+      async function deleteEmployee(id) {
+        if (!confirm('Delete this employee?')) return;
+        try {
+          const response = await fetch(`/api/employeemaster/employees/${id}`, {
+            method: 'DELETE'
+          });
+          if (response.ok) {
+            window.location.reload();
+          } else {
+            const data = await response.json();
+            alert(data.error || 'Unable to delete employee');
+          }
+        } catch (err) {
+          alert('Delete request failed.');
+        }
+      }

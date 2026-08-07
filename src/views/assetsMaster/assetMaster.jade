@@ -1,0 +1,69 @@
+extends ../layout/layout
+
+block content
+  .container
+    .page-banner
+      .row.align-items-center
+        .col-md-8
+          h1 Asset Master
+          p.lead Track and manage your asset inventory with clear workflows.
+        .col-md-4.text-md-end.mt-3.mt-md-0
+          a.btn.btn-light.btn-lg(href="/assetsMaster/add") Add Asset
+    .card
+      .card-body
+        .d-flex.justify-content-between.align-items-center.mb-4
+          h2.h5.mb-0 Asset Inventory 
+          if assets.length===0
+           
+          else
+           form.d-flex(role="search" action="/assetsMaster" method="get")
+            input.form-control.form-control-sm.me-2(type="search" name="search" placeholder="Search assets")
+            button.btn.btn-outline-primary.btn-sm(type="submit") Search
+        if assets && assets.length
+          .table-responsive
+            table.table.table-hover.mb-0
+              thead
+                tr
+                  th ID
+                  th Code
+                  th Name
+                  th Category
+                  th Make
+                  th Model
+                  th Location
+                  th Status
+                  th.text-center Actions
+              tbody
+                each asset in assets
+                  tr
+                    td= asset.assetId
+                    td= asset.assetCode
+                    td= asset.assetName
+                    td= asset.assetCategory ? asset.assetCategory.categoryName : "-"
+                    td= asset.make || "-"
+                    td= asset.model || "-"
+                    td= asset.location || "-"
+                    td
+                      span.badge(class=asset.status === 'Available' ? 'bg-success' : asset.status === 'Assigned' ? 'bg-info' : asset.status === 'Maintenance' ? 'bg-warning text-dark' : 'bg-secondary')= asset.status || "-"
+                    td.text-center
+                      a.btn.btn-sm.btn-outline-primary.me-2(href=`/assetsMaster/view/${asset.assetId}`) View
+                      a.btn.btn-sm.btn-outline-secondary.me-2(href=`/assetsMaster/edit/${asset.assetId}`) Edit
+                      a.btn.btn-sm.btn-outline-info.me-2(href=`/assetsMaster/history/${asset.assetId}`) History
+                      button.btn.btn-sm.btn-outline-danger(type="button" onclick=`scrapAsset(${asset.assetId})`) Scrap
+        else
+          .alert.alert-info.mb-0
+             | No assets found yet. Add a new asset to start tracking inventory.
+    script.
+      async function deleteAsset(id) {
+        if (!confirm('Delete this asset?')) return;
+        try {
+          const response = await fetch(`/api/assetsMaster/assets/${id}`, { method: 'DELETE' });
+          if (response.ok) window.location.reload();
+          else alert('Unable to delete asset.');
+        } catch (err) {
+          alert('Delete request failed.');
+        }
+      }
+      function scrapAsset(id) {
+        window.location.href = `/assetsMaster/scrap/${id}`;
+      }

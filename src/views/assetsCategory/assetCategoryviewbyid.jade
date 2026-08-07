@@ -1,0 +1,37 @@
+extends ../layout/layout
+
+block content
+  .container
+    .page-banner
+      .row.align-items-center
+        .col-md-8
+          h1 Category Details
+          p.lead View the selected asset category.
+        .col-md-4.text-md-end.mt-3.mt-md-0
+          a.btn.btn-light.btn-lg(href="/assetsCategory") Back to Categories
+    .card
+      .card-body
+        dl.row.mb-0
+          dt.col-sm-3 ID
+          dd.col-sm-9#categoryId Loading...
+          dt.col-sm-3 Name
+          dd.col-sm-9#categoryName Loading...
+          dt.col-sm-3 Active
+          dd.col-sm-9#categoryActive Loading...
+          dt.col-sm-3 Description
+          dd.col-sm-9#categoryDescription Loading...
+    script.
+      const categoryId = !{JSON.stringify(categoryId)};
+      async function loadCategoryDetails() {
+        const response = await fetch(`/api/assetsCategory/categories/${categoryId}`);
+        if (!response.ok) {
+          alert('Unable to load category details');
+          return;
+        }
+        const category = await response.json();
+        document.getElementById('categoryId').textContent = category.categoryId || '-';
+        document.getElementById('categoryName').textContent = category.categoryName || '-';
+        document.getElementById('categoryActive').textContent = category.isActive ? 'Yes' : 'No';
+        document.getElementById('categoryDescription').textContent = category.categoryDescription || '-';
+      }
+      loadCategoryDetails();

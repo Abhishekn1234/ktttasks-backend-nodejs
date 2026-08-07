@@ -1,0 +1,59 @@
+extends ../layout/layout
+
+block content
+  - function formatDisplayDate(dateString) {
+  -   if (!dateString) return '-';
+  -   const parsedDate = new Date(dateString);
+  -   if (Number.isNaN(parsedDate.getTime())) return dateString;
+  -   const day = String(parsedDate.getDate()).padStart(2, '0');
+  -   const month = parsedDate.toLocaleDateString('en-US', { month: 'short' }).toLowerCase();
+  -   const year = parsedDate.getFullYear();
+  -   return `${day} ${month} ${year}`;
+  - }
+  .container
+    .page-banner
+      .row.align-items-center
+        .col-md-8
+          h1 Asset Reports
+          p.lead View scrapped  assets. These are excluded from active inventory pages.
+        .col-md-4.text-md-end.mt-3.mt-md-0
+          a.btn.btn-light.btn-lg(href="/assetsMaster") Back to Assets
+    .card
+      .card-body
+        .d-flex.justify-content-between.align-items-center.mb-4
+          h2.h5.mb-0 Scrapped Assets
+          span.badge.bg-secondary.text-white= scrappedAssets ? scrappedAssets.length : 0
+        if scrappedAssets && scrappedAssets.length
+          .table-responsive
+            table.table.table-hover.mb-0
+              thead
+                tr
+                  th ID
+                  th Code
+                  th Name
+                  th Category
+                  th Purchase Date
+                  th Purchase Cost
+                  th Scrap Date
+                  th Reason
+                  th.text-center Actions
+              tbody
+                each asset in scrappedAssets
+                  tr
+                    td= asset.assetId
+                    td= asset.assetCode
+                    td= asset.assetName
+                    td= asset.assetCategory ? asset.assetCategory.categoryName : '-'
+                    td= asset.purchaseDate || '-'
+                    td= asset.purchaseCost || '-'
+                    td= asset.scrapDate || '-'
+                    td= asset.scrapReason || '-'
+                    td.text-center
+                      a.btn.btn-sm.btn-outline-primary.me-2(href=`/assetsMaster/history/${asset.assetId}`) History
+          .mt-4.d-flex.justify-content-between.align-items-center.border-top.pt-3
+            strong Total written-off value:
+            span.fs-5.text-danger= totalWrittenOffFormatted || '$0.00'
+        else
+          .alert.alert-info.mb-0
+            | No scrapped assets found. Use the "Scrap" action on an asset to mark it as obsolete.
+

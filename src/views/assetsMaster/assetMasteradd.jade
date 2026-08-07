@@ -1,0 +1,129 @@
+extends ../layout/layout
+
+block content
+  .container
+    .page-banner
+      .row.align-items-center
+        .col-lg-8
+          h1 Add Asset
+          p.lead Enter asset details to create a new inventory item.
+        .col-lg-4.text-lg-end.mt-4.mt-lg-0
+          a.btn.btn-light.btn-lg(href="/assetsMaster") Back to Assets
+    .card
+      .card-body
+        form#assetForm
+          .row.g-3
+            .col-md-6
+              label.form-label(for="assetCode") Asset Code
+              input.form-control(type="text" id="assetCode" name="assetCode" required)
+            .col-md-6
+              label.form-label(for="assetName") Asset Name
+              input.form-control(type="text" id="assetName" name="assetName" required)
+            .col-md-6
+              label.form-label(for="categoryId") Category
+              select.form-select(id="categoryId" name="categoryId" required)
+                option(value="" selected disabled) Select category
+                if categories && categories.length
+                  each category in categories
+                    option(value=category.categoryId)= category.categoryName
+                else
+                  option(value="" disabled) No categories available
+            .col-md-6
+              label.form-label(for="make") Make
+              input.form-control(type="text" id="make" name="make" required)
+            .col-md-6
+              label.form-label(for="model") Model
+              input.form-control(type="text" id="model" name="model" required)
+            .col-md-6
+              label.form-label(for="serialNumber") Serial Number
+              input.form-control(type="text" id="serialNumber" name="serialNumber" required)
+            .col-md-6
+              label.form-label(for="purchaseDate") Purchase Date
+              input.form-control(type="date" id="purchaseDate" name="purchaseDate")
+            .col-md-6
+              label.form-label(for="purchaseCost") Purchase Cost
+              input.form-control(type="number" step="0.01" min="0" id="purchaseCost" name="purchaseCost")
+            .col-md-6
+              label.form-label(for="location") Location
+              input.form-control(type="text" id="location" name="location")
+            .col-md-6
+              label.form-label(for="vendor") Vendor
+              input.form-control(type="text" id="vendor" name="vendor")
+            .col-md-6
+              label.form-label(for="warrantyExpiry") Warranty Expiry
+              input.form-control(type="date" id="warrantyExpiry" name="warrantyExpiry")
+            .col-md-6
+              label.form-label(for="status") Status
+              select.form-select(id="status" name="status")
+                option(value="Available") Available
+                option(value="Assigned") Assigned
+                option(value="Maintenance") Maintenance
+                option(value="Retired") Retired
+            .col-12
+              label.form-label(for="description") Description
+              textarea.form-control(id="description" name="description" rows="3")
+          .mt-4.d-flex.justify-content-end.gap-3
+            a.btn.btn-outline-secondary(href="/assetsMaster") Cancel
+            button.btn.btn-primary(type="submit") Save Asset
+    script.
+      function validateAssetForm(form) {
+        const requiredFields = ['assetCode', 'assetName', 'categoryId', 'make', 'model', 'serialNumber'];
+        for (const fieldName of requiredFields) {
+          if (!form[fieldName].value.trim()) {
+            alert(`${fieldName.replace(/([A-Z])/g, ' $1').replace(/^./, (char) => char.toUpperCase())} is required.`);
+            form[fieldName].focus();
+            return false;
+          }
+        }
+
+        const purchaseDate = form.purchaseDate.value;
+        const warrantyExpiry = form.warrantyExpiry.value;
+        if (purchaseDate && warrantyExpiry && warrantyExpiry < purchaseDate) {
+          alert('Warranty expiry date cannot be earlier than purchase date.');
+          form.warrantyExpiry.focus();
+          return false;
+        }
+
+        const purchaseCost = Number(form.purchaseCost.value);
+        if (form.purchaseCost.value && (Number.isNaN(purchaseCost) || purchaseCost < 0)) {
+          alert('Purchase cost must be a non-negative number.');
+          form.purchaseCost.focus();
+          return false;
+        }
+
+        return true;
+      }
+
+      document.getElementById('assetForm').addEventListener('submit', async function(event) {
+        event.preventDefault();
+        const form = event.target;
+        if (!validateAssetForm(form)) {
+          return;
+        }
+
+        const response = await fetch('/api/assetsMaster/assets', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            assetCode: form.assetCode.value.trim(),
+            assetName: form.assetName.value.trim(),
+            categoryId: parseInt(form.categoryId.value, 10),
+            make: form.make.value.trim(),
+            model: form.model.value.trim(),
+            serialNumber: form.serialNumber.value.trim(),
+            purchaseDate: form.purchaseDate.value || null,
+            purchaseCost: form.purchaseCost.value ? parseFloat(form.purchaseCost.value) : null,
+            location: form.location.value.trim(),
+            vendor: form.vendor.value.trim(),
+            warrantyExpiry: form.warrantyExpiry.value || null,
+            status: form.status.value,
+            description: form.description.value.trim()
+          })
+        });
+        if (response.ok) {
+          window.location.href = '/assetsMaster';
+        } else {
+          const data = await response.json().catch(() => ({}));
+          alert(data.error || 'Unable to save asset');
+        }
+      });
