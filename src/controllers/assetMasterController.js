@@ -111,7 +111,7 @@ const showScrapAssetPage=async(req,res)=>{
         if(!asset){
             return res.status(404).send('Asset not found');
         }
-        res.render('assetsMaster/assetScrap', { assetId: id, asset });
+        res.render('assetsScrap/assetScrap', { assetId: id, asset });
     }catch(err){
         res.status(500).json({error:err.message});
     }

@@ -30,7 +30,7 @@ const getIssueById = async (req, res) => {
       return res.status(200).json(issue);
     }
 
-    res.render('assetIssues/assetIssueviewbyid', { issueId: id, issue });
+    res.render('assetsIssues/assetIssueviewbyid', { issueId: id, issue });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
